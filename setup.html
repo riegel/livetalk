@@ -1,0 +1,149 @@
+<<
+if reload="ERROR" then
+ reload="REQUEST"
+ expand file=dirname(page)+"functions.lib" /expand
+/if
+
+
+
+
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+ <title>Live Answers - Setup and Diagnostics</title>
+ </head>
+
+<body>
+ <<displaymenu("SERVER")>>
+ <div class="setup">
+ <table width="600">
+  <tr>
+   <td colspan="5">
+    <a href="<<page>>"><img src="images/reload" width="12" height="12" border="0"></a> | <b>Setup</b> | <a href="chatarchives.html">Archives</a> | <a href="<<iconpage>>">Desktop</a><hr>
+ <<
+    ready=sendcommand("READY")
+    if left(ready,5)="ERROR" then
+     display "<b>A fatal error was encountered.</b> <i>("+ready+")</i><br>Proper operation will be halted until this is resolved. Perhaps the server isn't running." /display
+     bridges="ERROR"
+    else
+     display "<b>"+ready+" Connections available.</b>" /display
+     bridges=sendcommand("BRIDGES")
+    /if
+    display '<br>&nbsp;&nbsp;&nbsp;<i>reset the server after changing server proxies or csr list</i><br>&nbsp;<br></td></tr>' /display
+
+  if message<>'ERROR' then 
+   display '
+   <tr>
+    <td colspan="5" style="color: red;"><a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0" title="Clear Error"></a>&nbsp;'+message+'<br>&nbsp;<br></td>
+   </tr>' /display
+  /if
+  message='ERROR'
+ >>
+   <tr>
+    <td bgcolor="#aaaaaa" width="250"><table width="100%"><tr><td>Web Site</td><td align="right"><img src="images/edit.gif" width="12" height="12" title="Edit Web Site Graphics" border="0"></td></tr></table></td>
+    <td rowspan="2" valign="middle">&lt;<br>&gt;</td>
+    <td bgcolor="#aaaaaa" width="250"><table width="100%"><tr><td>Server Proxies <a href="reload"><i>(reset)</i></a></td><td align="right"><<ci_csv('webbots.csv',page,'','<img src="images/edit.gif" width="12" height="12" title="Edit Server Proxies" border="0">','','TRUE')>></td></tr></table></td>
+    <td rowspan="2" valign="middle">&lt;<br>&gt;</td>
+    <td bgcolor="#aaaaaa" width="250"><table width="100%"><tr><td>CSR</td><td align="right"><<ci_csv('csrlist.csv',page,'','<img src="images/edit.gif" width="12" height="12" title="Edit CSR List" border="0">','','TRUE')>></td></tr></table></td>
+   </tr>
+   <tr>
+    <td valign="center" align="center" bgcolor="#cccccc">
+     <<weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.gif" border="0"></a>^>>
+     <<weblink>><br>
+    </td>
+    <td valign="top" bgcolor="#ccccccc">
+     <table width="100%">
+     <<
+      for name=webbots rownum=x do
+       display toggle(bridges[8,x],'
+      <tr>
+       <td><img src="images/online.gif" width="12" height="12" border="0" title="Online"></td>
+       <td>'+webbots[1,x]+'</td>
+       <td><a href="disconnect" name="botnum" value="'+x+'"><img src="images/disconnect.gif" width="12" height="12" title="Disconnect Webbot" border="0"></a></td>
+      </tr>','
+      <tr>
+       <td><img src="images/offline.gif" width="12" height="12" border="0" title="Offline"></td>
+       <td>'+webbots[1,x]+'</td>
+       <td><a href="connect" name="botnum" value="'+x+'"><img src="images/connect.gif" width="12" height="12" title="Connect Webbot" border="0"></a></td>
+      </tr>') /display
+      /for
+     >>
+     </table>
+    </td>
+    <td valign="top" bgcolor="#ccccccc">
+     <table width="100%">
+     <<
+      for name=csrlist rownum=x do
+       display toggle(bridges[7,x*rows(webbots)],'
+      <tr>
+       <td><img src="images/online.gif" width="12" height="12" title="Online" border="0"></td>
+       <td>'+csrlist[2,x]+'</td>
+      </tr>','
+      <tr>
+       <td><img src="images/offline.gif" width="12" height="12" title="Offline" border="0"></td>
+       <td>'+csrlist[2,x]+'</td>
+      </tr>') /display
+      /for
+     >>
+     </table>
+    </td>
+   </tr>
+   <tr>
+    <td colspan="5">
+     <br>Code to paste into your website.
+     <textarea cols="60" rows="4" name="weblink" style="width: 100%; height: 75px;"></textarea>
+    </td>
+   </tr>
+   <tr>
+    <td colspan="5">
+     <br><i>Click top left corner of graphic(s) to change</i>
+    </td>
+   </tr>
+   <tr>
+   <tr>
+    <td colspan="5">
+     <br>Accepting Connections Graphic.<br>
+     <<ci_img('images/livehelp.gif','','','TRUE')>>
+    </td>
+   </tr>
+   <tr>
+    <td colspan="5">
+     <br>No Connections Available Graphic.<br>
+     <<ci_img('images/livehelpoff.gif','','','TRUE')>>
+    </td>
+   </tr>
+   <tr>
+    <td colspan="5">
+     <br>Live Help not working Graphic.<br>
+     <<ci_img('images/livehelpna.gif','','','TRUE')>>
+    </td>
+   </tr>
+   <tr>
+    <td colspan="5">
+     <br>ci Logo.<br>
+     <<ci_img('images/cilogo.gif','','','TRUE')>>
+    </td>
+   </tr>
+  </table>
+ </div>
+</body>
+</html>
+<<overlay connect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("CONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay disconnect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("DISCONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay reload
+ reload="ERROR"
+ message=sendcommand("RELOAD")
+ goto page
+>>
+

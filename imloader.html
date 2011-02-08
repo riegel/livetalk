@@ -1,0 +1,21 @@
+<<
+ready=sendcommand("READY")
+>>
+<html>
+  <<chatid>><hr>
+  <a href="<<page>>">Reload</a><hr>
+<<
+ if isinteger(ready) then
+  if ready=0 then
+   display "No one is available right now." /display
+   if iconpage<>"ERROR" then display '<br>Click to <a href="setup.html">setup</a>' /display /if
+  else
+   display ready+' Representatives standing by. Click to <a '+ci_parsehref(^href="chat.html" popup="470,320"^)+'>Chat</a>.' /display
+   if iconpage<>"ERROR" then display '<br>Click to <a href="setup.html">setup</a>' /display /if
+  /if
+ else
+  # DO NOTHING NO CHAT SYSTEM FOUND /#
+  if iconpage<>"ERROR" then display 'Chat system not found. Click to <a href="setup.html">setup</a>' /display /if
+ /if
+>>
+</html>

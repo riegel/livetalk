@@ -1,0 +1,16 @@
+<html>
+ <head>
+  <script language="javascript" type="text/javascript" src="<<syspublicurl>>/clearimage/jscripts/prototype.js"></script>
+  <script language="javascript" type="text/javascript" src="<<syspublicurl+dirname(page)>>chat.js?<<random(1000,9999)>>"></script>
+  <script>
+    posturl='<<getlink('chathandler.html')>>';
+   emailurl='<<getlink('email.html')>>';
+  </script>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+  <title>Live Answers</title>
+ </head>
+ <body>
+  <textarea name="mycomment" id="mycomment" class="mycomment"></textarea>
+  <div id="serversaid" class="chatbox"><div class="userinfo"><<fillin(companylogo)>><br><b>Establishing communication with server...</b></div></div>
+ </body>
+</html>

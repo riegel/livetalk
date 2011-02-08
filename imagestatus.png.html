@@ -1,0 +1,61 @@
+<<
+  # imagestatus.png does a goto to this page /#
+
+
+datetime=now
+ip=getenv('REMOTE_ADDR')
+temp=dbadd('/livetalk/connections')
+
+function sendcommand(command) locals temp,path,t,x,tr do
+  securitycode=encrypt(domainname,"livetalk")
+  x=netsockopen(0,"localhost",portnumber,100)
+  if x[1,1]<>'TRUE' then x=netsockclose(0) return 'ERROR Connecting to AIM RELAY server' /return /if
+  x=netsockwrite(0,securitycode+" "+command+cr+lf)
+  if x[1,1]<>'TRUE' then x=netsockclose(0) return 'ERROR Writing command to AIM RELAY server' /return /if
+  x=""
+  temp=""
+  while x<>"CLOSE" do
+   x=netsockread(0,500)
+   if x="CLOSE" then else temp=temp+x+lf /if
+  /while
+  x=netsockclose(0)
+  if left(command,7)="BRIDGES" then
+   temp=replaceall(temp,'"','')
+   if right(temp,1)=lf then temp=left(temp,length(temp)-1) /if
+   temp=ci_deltexttovar(temp,lf,",")
+  /if
+  return temp /return
+/function
+
+
+
+
+
+
+function DLLci_deltexttovar(text,rw,cl) locals a,b,c,x do
+ text=split(text,rw)
+ a='ERROR'
+ for name=text rowname=b do
+  b=listtorow(b,cl)
+  for name=x value=1 to cols(b) do
+   b[x,1]=replaceall(b[x,1],'{COMMA}',',')
+   b[x,1]=replaceall(b[x,1],'{PIPE}','|')
+  /for
+  if a='ERROR' then a=b else a=append(a,b) /if
+ /for
+ return a /return
+/function
+
+
+
+ready=sendcommand("READY")
+if ready>0 and isinteger(ready) then
+ b='images/livehelp.png'
+elif ready=0 then
+ b='images/livehelpoff.png'
+else
+ b='images/livehelpna.png'
+/if
+  y=filepush(b,"image/png")
+>>
+

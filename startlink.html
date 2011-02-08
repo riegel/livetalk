@@ -1,0 +1,35 @@
+<<
+expand file=dirname(page)+"functions.lib" /expand
+HTTP_REFERER=getenv("HTTP_REFERER")
+copy file=dirname(page)+"chat_companies.csv" ts="," to chat_companies /copy
+
+
+companyid="Welcome, Please wait while a representative is contacted."
+companyname=""
+
+
+for name=chat_companies rowname=x do
+ if count(HTTP_REFERER,x[1])>0 then
+  if isfile(dirname(page)+lower("logos/"+aestivafilename(x[2]))) then
+   companyid='<img src="'+domainurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'"><br>'+fillin(x[3])+'<br>'
+   companylogo='<img src="'+domainurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'">'
+  else
+   companyid=fillin(x[3])
+   companylogo=""
+  /if
+  companyname=fillin(x[2])
+ /if
+/for
+
+ready=sendcommand("READY")
+chatid=ci_cookieread("livetalk"+companyname)
+if chatid="ERROR" then
+ chatid=getchatid()
+ temp=ci_cookiewrite("livetalk"+companyname,chatid,adddays(now,730))
+/if
+if left(ready,5)="ERROR" or ready=0 then
+ goto "email.html"
+else
+ goto "chat.html"
+/if
+>>

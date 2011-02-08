@@ -1,0 +1,194 @@
+<<expand file="functions.lib" /expand
+
+
+
+
+
+function lt_randomimage(rndmsg1) locals cidemo,x,aa,temp,path do
+  path=dirname(page)+'tmp/'
+  temp=sysmd(path)
+  if not(isfile(path+'verify'+usernum+'.jpg')) then temp=ci_cpfile(dirname(page)+'images/bg.jpg',path+'verify'+usernum+'.jpg') /if
+  if rndmsg1='' or rndmsg1='ERROR' or length(rndmsg1)<>4 then
+   rndmsg="X"
+   a=random(1,31) if a<9 then a=a+49 elif a<20 then a=a+88 elif a<22 then a=a+89 else a=a+90 /if
+   rndmsg=rndmsg+ascii(a)
+   a=random(1,31) if a<9 then a=a+49 elif a<20 then a=a+88 elif a<22 then a=a+89 else a=a+90 /if
+   rndmsg=rndmsg+ascii(a)
+   a=random(1,31) if a<9 then a=a+49 elif a<20 then a=a+88 elif a<22 then a=a+89 else a=a+90 /if
+   rndmsg=rndmsg+ascii(a)
+   a=random(1,31) if a<9 then a=a+49 elif a<20 then a=a+88 elif a<22 then a=a+89 else a=a+90 /if
+   rndmsg=rndmsg+ascii(a)
+   rndmsg=right(rndmsg,4)
+  else
+   rndmsg=rndmsg1
+  /if
+  ci_demo=filelist(path)
+  for name=ci_demo rowname=x do
+   if adddays(left(x[3],8),0)=today or adddays(left(x[3],8),0)=yesterday then else
+    if x[1]<>"is.gif" then temp1=ci_rmimage(ci_approot+"tmp/"+x[1]) /if
+   /if
+  /for
+#
+  aa='OVERWRITE-font Helvetica -pointsize 33 -fill "#ffffff" '+
+     '-draw "text '+(random(0,10)+6)+','+(25+random(7,13))+' '+"'"+middle(rndmsg,1,1)+"'"+'" '+
+     '-draw "text '+(random(0,10)+39)+','+(25+random(7,13))+' '+"'"+middle(rndmsg,2,2)+"'"+'" '+
+     '-draw "text '+(random(0,10)+72)+','+(25+random(7,13))+' '+"'"+middle(rndmsg,3,3)+"'"+'" '+
+     '-draw "text '+(random(0,10)+106)+','+(25+random(7,13))+' '+"'"+middle(rndmsg,4,4)+"'"+'"'
+/#
+
+  aa='OVERWRITE-font Helvetica -pointsize 18 -fill "#ffffff" '+
+     '-draw "text '+(random(0,5)+3)+','+(12+random(3,6))+' '+"'"+middle(rndmsg,1,1)+"'"+'" '+
+     '-draw "text '+(random(0,5)+20)+','+(12+random(3,6))+' '+"'"+middle(rndmsg,2,2)+"'"+'" '+
+     '-draw "text '+(random(0,5)+36)+','+(12+random(3,6))+' '+"'"+middle(rndmsg,3,3)+"'"+'" '+
+     '-draw "text '+(random(0,5)+53)+','+(12+random(3,6))+' '+"'"+middle(rndmsg,4,4)+"'"+'"'
+
+
+  x='ERROR'
+  x[1]=ci_img2(path+'verify'+usernum+'.jpg','','','FALSE','','convert',aa)
+  x[2]=rndmsg
+  return x /return
+/function
+
+
+
+
+
+
+
+
+
+code=lt_randomimage('')
+>>
+<HTML>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+  <title>Live Answers - Email Us</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+ </head>
+ <body>
+<<
+
+if count(getenv('HTTP_USER_AGENT'),'iPhone')>0 then
+
+
+
+
+ if success="TRUE" then
+  success="ERROR"
+  temp='
+   <table width="100%" height="95%" cellpadding="10" cellspacing="0">
+    <tr>
+     <td bgcolor="#ffffff" align="left" valign="top">
+      '+fillin(chatemailok)+'
+     </td>
+    </tr>
+   </table>'+lf
+ else
+  temp='
+  <form action="feedback" method="post" name="f">
+   <table width="100%" height="95%" cellpadding="0" cellspacing="0">
+    <tr>
+     <td bgcolor="#ffffff" align="left" valign="top" style="padding: 10px;">'
+      if rrq<>"ERROR" then
+       rrq="ERROR" stat="ERROR" prevstat="ERROR" bcast="ERROR" reload="ERROR"
+       temp=temp+fillin(chatnoanswer)
+      else
+       temp=temp+fillin(chatoffline)
+      /if
+      if errmsg<>"" and errmsg<>"ERROR" then temp=temp+'<p><font color="red">'+errmsg+'</font></p>' errmsg="ERROR" /if
+      temp=temp+'
+     </td>
+    </tr>
+    <tr>
+     <td align="center" bgcolor="#dddddd">
+      <table cellpadding="0">
+       <tr>
+        <td>Image&nbsp;Code:<br><table cellpadding="0" cellspacing="0" border="0"><tr><td><input type="text" name="usercode" size="10"></td><td>'+code[1]+'</td></tr></table></td>
+       </tr>
+       <tr>
+        <td>Message:<br><textarea name="usermsg" cols="35" rows="6" style="width: 100%; height: 100px;"></textarea></td>
+       </tr>
+       <tr>
+        <td>Email&nbsp;Address:<br><input type="text" name="useremail" size="30"></td>
+       </tr>
+       <tr>
+        <td><input type="submit" name="mybutton" value="Leave Message"></td>
+       </tr>
+      </table>
+     </td>
+    </tr>
+   </table>
+  </form>'+lf
+ /if
+
+
+
+
+else
+ if success="TRUE" then
+  success="ERROR"
+  temp='
+   <table width="100%" height="95%" cellpadding="20" cellspacing="0">
+    <tr>
+     <td bgcolor="#ffffff" align="left" valign="top">
+      '+fillin(chatemailok)+'
+     </td>
+    </tr>
+   </table>'+lf
+ else
+  temp='
+  <form action="feedback" method="post" name="f">
+   <table width="100%" height="95%" cellpadding="4" cellspacing="0">
+    <tr>
+     <td bgcolor="#ffffff" align="left" valign="top" style="padding: 30px;">'
+      if rrq<>"ERROR" then
+       rrq="ERROR" stat="ERROR" prevstat="ERROR" bcast="ERROR" reload="ERROR"
+       temp=temp+fillin(chatnoanswer)
+      else
+       temp=temp+fillin(chatoffline)
+      /if
+      if errmsg<>"" and errmsg<>"ERROR" then temp=temp+'<p><font color="red">'+errmsg+'</font></p>' errmsg="ERROR" /if
+      temp=temp+'
+     </td>
+    </tr>
+    <tr>
+     <td align="center" bgcolor="#dddddd">
+      <table cellpadding="2">
+ <!--
+       <tr><td align="right" valign="top">From:</td><td valign="top" colspan="2">Web Visitor: '+chatid+'</td></tr>
+ -->
+       <tr>
+        <td align="right" valign="top">Image&nbsp;Code:</td>
+        <td colspan="2" valign="top" align="left"><table cellpadding="0" cellspacing="0" border="0"><tr><td><input type="text" name="usercode" size="10"></td><td>'+code[1]+'</td></tr></table></td>
+       </tr>
+ 
+       <tr>
+        <td align="right" valign="top">Message:</td>
+        <td valign="top" colspan="2"><textarea name="usermsg" cols="35" rows="6" style="width: 100%; height: 100px;"></textarea></td>
+       </tr>
+       <tr>
+        <td align="right" valign="top">Email&nbsp;Address:</td>
+        <td valign="top"><input type="text" name="useremail" size="30"></td>
+        <td valign="top" align="right"><input type="submit" name="mybutton" value="Leave Message"></td>
+       </tr>
+      </table>
+     </td>
+    </tr>
+   </table>
+  </form>'+lf
+ /if
+/if
+display temp /display
+>>
+ </body>
+</html>
+<<overlay feedback
+temp=netmail(emailto,emailto,"LiveTalk Feedback","NAME: "+chatid+lf+"EMAIL: "+useremail+lf+"MESSAGE: "+usermsg,20,"","From: "+useremail+lf)
+if temp[1,1]="TRUE" then
+ success="TRUE"
+else
+ success="ERROR"
+ errmsg="There was a problem sending your feedback."
+/if
+goto page
+>>

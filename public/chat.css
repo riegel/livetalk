@@ -1,0 +1,12 @@
+ body          {margin:0; padding:0; border:0; background-color: #dddddd; font: normal 12px 'Lucida Grande', Geneva, Arial, Verdana, sans-serif; color: #777777;}
+ .diagnostics  {background-color: #000000; position: absolute; top: 0;     left: 0; width: 300px; height: 20px; margin: 0; border: none; overflow: none; color: #ffffff;}
+ .chatbox      {background-color: #ffffff; position: absolute; top: 0;     left: 0; width: 400px; height: 200px; margin: 5px;  border: 1px solid #aaaaaa; overflow: auto;}
+ .chatboxr     {background-color: #ffffff; position: relative; top: 0;     left: 0; width: 400px; margin: 5px;  border: 1px solid #aaaaaa; overflow: auto;}
+ .chatboxp     {background-color: #ffffff; position: relative; top: 0;     left: 0; width: 600px; margin: 5px;  border: 1px solid #aaaaaa;}
+ .mycomment    {position: absolute; top: 210px; left: 0; width: 402px; height:  60px; margin: 5px;  border: 1px solid #aaaaaa;}
+ .usertext     {background-color:#f5f9ff; margin:0; padding: 7px; padding-left: 12px; padding-right: 12px; border: none; border-top: 1px solid #dddddd;}
+ .reptext      {background-color:#b5d9ff; margin:0; padding: 7px; padding-left: 12px; padding-right: 12px; border: none; border-top: 1px solid #dddddd; color: #222222;}
+ .userinfo     {font-size: 8pt; background-color:#ffffff; margin:0; padding: 7px; border:0; text-align: center; color: bbbbbb;}
+ .setup        {font-size: 10pt; margin: 10px; padding: 3px;}
+ .setup td, td {font-size: 10pt;}
+ a             {color: #222222;}

@@ -1,0 +1,98 @@
+<<
+if reload="ERROR" then reload="REQUEST" /if
+expand file="functions.lib" /expand
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+ <title>Live Answers - Status</title>
+ </head>
+<body>
+ <<displaymenu("Server")>>
+<form action="saveit" method="post">
+<div class="setup">
+ <center>
+  <b>Setup your LiveTalk Server.</b><br>&nbsp;<br>
+  <<if message<>"ERROR" then display '<div style="color: red;"><a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0"></a>'+message+'</div><br>&nbsp;<br>' /display /if message="ERROR">>
+  <div style="width: 650px; background-color: #CCCCCC; text-align: left; padding: 10px;">
+   <<ci_csv('csrlist.csv',page,'','Edit CSR List','','TRUE')>><br>
+   <<ci_csv('webbots.csv',page,'','Edit WebBot List','','TRUE')>><br>
+   <br><b>The following will be replaced at runtime.<br>
+   <table>
+    <tr><td align="right">[csrname]</td><td> - The current Customer Service Representative</td></tr>
+    <tr><td align="right">[now]</td><td> - Current server time</td></tr>
+    <tr><td align="right">[email]</td><td> - Link to the email area</td></tr>
+    <tr><td align="right">[chat]</td><td> - Link to the chat area</td></tr>
+   <table>
+<<
+ copy file="chat_vars.csv" ts="," to chat_vars /copy
+ for name=chat_vars rowname=x do
+  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+   temp=indirectionset(aestivafilename(x[1]),x[2])
+  /if
+ /for
+ copy '<<portnumber='+portnumber+' securitycode="'+securitycode+'" goto "imagestatus.gif.html">>' to file="imagestatus.gif" /copy
+ for name=chat_vars rowname=x do
+  if x[1]="-" then
+    display ^
+      <tr>
+       <td colspan="2"><br>&nbsp;<br><b>^+x[3]+^</b></td>
+      </tr>
+    ^ /display
+  else
+   if not(isinteger(x[4])) then x[4]=1 /if
+   if x[1]="securitycode" or x[1]="portnumber" then
+    display ^<input type="hidden" name="^+x[1]+^">^ /display
+   elif x[1]="loginurl" then
+    loginurl=sysstartlink+dirname(page)+'login.html'
+    display ^<input type="hidden" name="^+x[1]+^">^ /display
+   else
+    display ^
+      <tr>
+       <td><textarea name="^+x[1]+^" style="width: 350px; height: ^+((1+x[4])*18)+^px;"></textarea></td>
+       <td align="left">^+x[3]+^</td>
+      </tr>
+    ^ /display
+   /if
+  /if
+ /for
+>>
+    <tr><td colspan="2"><input type="submit" name="mybutton" value="Save Changes"></td></tr>
+   </table>
+  </div>
+ </div>
+</form>
+</body>
+</html>
+<<overlay connect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("CONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay disconnect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("DISCONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay reload
+ reload="ERROR"
+ message=sendcommand("RELOAD")
+ goto page
+>>
+<<overlay saveit
+ copy file="chat_vars.csv" ts="," to chat_vars /copy
+ securitycode=encrypt(domainname,"livetalk")
+ for name=chat_vars rownum=x do
+  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+   chat_vars[2,x]=indirection(chat_vars[1,x])
+  /if
+ /for
+ copy chat_vars to file="chat_vars.csv" ts="," /copy
+ message="Information Saved"
+ goto page
+>>
+
+
+

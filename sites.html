@@ -1,0 +1,132 @@
+<<
+if reload="ERROR" then reload="REQUEST" /if
+expand file="functions.lib" /expand
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css?random=<<random(1000,9999)>>" media="all">
+ <title>Live Answers - Sites</title>
+ </head>
+<body>
+ <<displaymenu("Sites")>>
+ <div class="setup">
+  <center>
+     <b>Configure Live Talk to handle requests for multiple websites.</b><br>&nbsp;<br>
+
+
+<<
+  if message<>'ERROR' then 
+   display '
+    <div style="color: red;">
+     <a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0" title="Clear Error"></a>&nbsp;'+message+'<br>&nbsp;<br>
+    </div>' /display
+  /if
+  message='ERROR'
+>>
+
+
+     <<ci_edit("chat.css",800,600,"<i>Edit Cascading Style Sheet (CSS)</i>",'',"TRUE")>><br>&nbsp;<br>
+<form action="saveit" method="post">
+<<
+ copy file="chat_companies.csv" ts="," to chat_companies /copy
+ a[1]='' a[2]='' a[3]=''
+ chat_companies=append(chat_companies,a)
+ for name=chat_companies rownum=x do
+  chat_companies[3,x]=replaceall(chat_companies[3,x],"<br>",lf)
+  display ^
+     <table cellpadding="3" cellspacing="0" border="0">
+      <tr><td colspan="2" bgcolor="#CCCCCC">^ /display 
+
+  if chat_companies[2,x]="" or chat_companies[2,x]="ERROR" then
+   display '<b>To add another website fill in these fields and click Save.</b>' /display
+  else
+   display '<a href="saveit" name="chat_companydelete" value="'+x+'"><img src="images/disconnect.gif" border="0" width="12" height="12"></a>&nbsp;&nbsp;<b>'+chat_companies[1,x]+'</b> <i>('+chat_companies[2,x]+')</i>' /display
+  /if
+
+
+  display ^</td></tr>
+      <tr>
+       <td bgcolor="#cccccc" valign="top" style="width: 350px;">
+        ^ /display 
+  if chat_companies[2,x]="" or chat_companies[2,x]="ERROR" then
+
+  else
+   display '' /display
+  /if
+
+  display ^
+        <br>&nbsp;<br>Referrer Substring<br>
+        <input type="text" name="chat_companies[1,^+x+^]" style="width: 350px;"><br>
+        <i>(where the request is coming from)</i><br>&nbsp;<br>
+        Short Company Name<br>
+        <input type="text" name="chat_companies[2,^+x+^]" style="width: 350px;"><br>
+        <i>(for CSR to determine what site is requesting help)</i><br>&nbsp;<br>
+        Company Decription<br>
+        <textarea name="chat_companies[3,^+x+^]" style="width: 350px; height: 150px;" wrap="off"></textarea><br>
+       </td>
+  ^ /display 
+  if chat_companies[2,x]="" or chat_companies[2,x]="ERROR" then
+  display ^
+       <td bgcolor="#aaaaaa">
+        <div class="chatboxr"><div class="userinfo">
+         This is a preview area. Fill in the fields to the left to preview.
+        </div></div>
+       </td>
+  ^ /display
+  else
+  display ^
+       <td bgcolor="#aaaaaa">Preview Area (Web Visitors see this) ^+ci_popup(lower("logos/"+aestivafilename(chat_companies[2,x])),'add/modify logo')+^
+        <div class="chatboxr">
+         <div class="userinfo">^+ci_img(lower("logos/"+aestivafilename(chat_companies[2,x])),'','','FALSE')+^<br>^+replaceall(chat_companies[3,x],lf,'<br>')+^</div>
+         <div class="reptext">Welcome, this is John P. Bodie. I am a sample representative. May I help you?</div>
+         <div class="usertext">Hello, I am John Q. Smith. I need help buying lots of stuff from you. What do you sell?</div>
+         <div class="userinfo">Informative text looks like this</div>
+         <div class="reptext">We sell widget tools for fixing widgets.</div>
+         <div class="usertext">Thanks for your help. Bye.</div>
+        </div>
+       </td>
+  ^ /display
+  /if
+
+  display ^
+      </tr>
+      <tr><td colspan="2">&nbsp;</td></tr>
+     </table>
+  ^ /display
+ /for
+>>
+<input type="submit" name="mybutton" value="Save">
+</form>
+
+
+
+
+
+ </center>
+ </div>
+</body>
+</html>
+<<overlay saveit
+ message=""
+ if chat_companydelete<>"ERROR" then
+  if isfile(lower("logos/"+aestivafilename(chat_companies[2,chat_companydelete]))) then
+   temp=ci_rmfile(lower("logos/"+aestivafilename(chat_companies[2,chat_companydelete])))
+  /if
+  chat_companies[2,chat_companydelete]=""
+  message=message+"Record Deleted<br>"
+ /if
+ chat_companydelete="ERROR"
+ for name=chat_companies rownum=x do
+  chat_companies[3,x]=replaceall(chat_companies[3,x],lf,"<br>")
+  if chat_companies[2,x]="" or chat_companies[2,x]="ERROR" then
+   chat_companies[1,x]='' chat_companies[2,x]='' chat_companies[3,x]=''
+  /if
+ /for
+ chat_companies=nodups(chat_companies)
+ chat_companies=reversesortcol(chat_companies,2)
+ if chat_companies[2,rows(chat_companies)]="" then chat_companies=delrow(chat_companies,rows(chat_companies)) /if
+ copy chat_companies to file="chat_companies.csv" ts="," /copy
+ message=message+"Changes saved<br>"
+ goto page
+>>
+

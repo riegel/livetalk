@@ -1,0 +1,107 @@
+<<
+if reload="ERROR" then reload="REQUEST" /if
+expand file="functions.lib" /expand
+copy file="webusers.csv" ts="," to webusers /copy
+
+temp=append(sysls("chatsarchive"),sysls("chats"))
+temp=gettable(temp,1,1,1,rows(temp))
+temp=nodups(temp)
+temp=sortcol(temp,1)
+chatlist='<table width="100%">'
+for name=temp rowname=x do
+ if right(x[1],4)=".txt" then
+  z=replace(replace(x[1],'comments',''),'.txt','') zz='unknown'
+  for name=webusers rowname=y do
+   if z=y[1] then zz=y[2] /if
+  /for
+  if curchat="ERROR" then curchat=x[1] /if
+  if curchat=x[1] then
+   chatlist=chatlist+'
+<tr>
+ <td><a href="delchat" name="curchat" value="'+curchat+'"><img src="images/disconnect.gif" width="12" height="12" border="0"></a></td>
+ <td><a href="'+page+'" name="curchat" value="'+x[1]+'" style="text-decoration: none; color: #ffffff;">'+zz+'</a></td>
+ <td>('+z+')</td>
+</tr>'
+  else
+   chatlist=chatlist+'
+<tr>
+ <td>&nbsp;</td>
+ <td><a href="'+page+'" name="curchat" value="'+x[1]+'" style="text-decoration: none; color: #444444;">'+zz+'</a></td>
+ <td>('+z+')</td>
+</tr>'
+  /if
+ /if
+/for
+chatlist=chatlist+'</table>'
+copy file=dirname(page)+"chatsarchive/"+curchat to curchattext /copy
+if curchattext="ERROR" then curchattext="" /if
+copy file=dirname(page)+"chats/"+curchat to temp /copy
+if curchattext='' then
+ curchattext=temp
+else
+ if temp<>"ERROR" and temp<>'' then
+  curchattext=curchattext+'<div class="userinfo" style="color: #ffffff; border: 2px solid #000000; border-left: none; border-right: none; background-color: red;">END ARCHIVE...BEGIN CURRENT...</div>'+temp
+ /if
+/if
+
+if chatlist="ERROR" then chatlist="No Archives found" /if
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+ <title>Live Answers - Archives</title>
+ </head>
+<body>
+ <<displaymenu("Archives")>>
+ <<
+  if message<>"ERROR" then 
+   display '<span style="color: red;"><a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0"></a>'+message+'</span>' /display
+  else
+   display '<span style="color: red;"><img src="images/reload.gif" width="12" height="12" border="0"></span>' /display
+  /if
+  message="ERROR"
+ >>
+
+ <div class="setup">
+  <center>
+   <b>LiveTalk Archive</b><br>&nbsp;<br>
+   <div style="width: 675px; background-color: #CCCCCC; text-align: left; padding: 10px;">
+    <table cellpadding="5" cellspacing="0" border="0">
+     <tr>
+      <td bgcolor="#cccccc" valign="top">
+       <div style="width: 250px; height: 500px;">
+        <<chatlist>>
+       </div>
+      </td>
+      <td bgcolor="#aaaaaa" valign="top"><<curchat>> | <a href="printarchive.html" target="new">Print</a>
+       <div class="chatboxr"><<curchattext>></div>
+      </td>
+     </tr>
+    </table>
+   </div>
+  </center>
+ </div>
+</body>
+</html>
+<<overlay delchat
+ temp=ci_rmfile("chats/"+curchat)
+ temp=ci_rmfile("chatsarchive/"+curchat)
+ message=curchat+" removed."
+ curchat="ERROR"
+ goto page
+>>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

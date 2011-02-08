@@ -1,0 +1,41 @@
+<<
+temp=append(sysls("chatsarchive"),sysls("chats"))
+temp=gettable(temp,1,1,1,rows(temp))
+temp=nodups(temp)
+temp=sortcol(temp,1)
+chatlist=""
+for name=temp rowname=x do
+ if right(x[1],4)=".txt" then
+  if curchat="ERROR" then curchat=x[1] /if
+  if curchat=x[1] then
+   chatlist=chatlist+x[1]+'<br>'
+  else
+   chatlist=chatlist+'<a href="'+page+'" name="curchat" value="'+x[1]+'">'+x[1]+'</a><br>'
+  /if
+ /if
+/for
+chatlist=left(chatlist,length(chatlist)-4)
+copy file=dirname(page)+"chatsarchive/"+curchat to curchattext /copy
+if curchattext="ERROR" then curchattext="" /if
+copy file=dirname(page)+"chats/"+curchat to temp /copy
+if temp<>"ERROR" then
+ curchattext=curchattext+'<div class="userinfo" style="color: #ffffff; border: 2px solid #000000; border-left: none; border-right: none; background-color: red;">END ARCHIVE...BEGIN CURRENT...</div>'+temp
+/if
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+  <title>Live Answers (Archives)</title>
+ </head>
+ <body>
+  <div class="setup">
+   <a href="setup.html">Setup</a> | <b>Archives</b> | <a href="<<iconpage>>">Desktop</a><hr>
+   <table cellpadding="5" cellspacing="0" border="0">
+    <tr>
+     <td bgcolor="#cccccc" valign="top" style="width: 150px; height: 400px;"><<chatlist>></td>
+     <td bgcolor="#aaaaaa"><div class="chatboxr"><<curchattext>></div></td>
+    </tr>
+   </table>
+  </div>
+ </body>
+</html>

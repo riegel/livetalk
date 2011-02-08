@@ -1,0 +1,117 @@
+<<
+expand file="/livetalk/functions.lib" /expand
+
+
+ if rrq="ERROR" then rrq=0 /if
+
+ if rrq=0 then chatbegin=systime /if
+
+ rrq=rrq+1
+ if reload="ERROR" then
+  reload="REQUEST"
+  expand file=dirname(page)+"functions.lib" /expand
+ /if
+
+
+ # STATUS:   CONNECTING CONNECTED DISCONNECTED 
+ # First we determine what the client wants from us, and put it in ajaxrequest /#
+ ptwr=twr
+ tq=getenv('Content-type')
+ twr=getenv('QUERY_STRING')
+ twr=replace(twr,'?','')
+ temp=ci_deltexttovar(twr,'&','=')
+ twr=''
+ for name=temp rowname=x do
+  if x[1]='ajaxrequest' then ajaxrequest=unpostprep(x[2]) /if
+ /for
+ ajaxrequest=replaceall(replaceall(replaceall(ajaxrequest,'&','&amp;'),'<','&lt;'),lf,'<br>')
+ if right(ajaxrequest,4)='<br>' then ajaxrequest=left(ajaxrequest,length(ajaxrequest)-4) /if
+ # Ok we have ajaxrequest, it has been cleaned up of any HTML etc. and it is either a reserved word          /#
+ # Reserved words: CHECK CLOSE                                                                               /#
+ # or it is a string of text to append to the ongoing conversation                                           /#
+ #                                                                                                           /#
+ # Ok now we save the request if we are sure we are connected to a csr i.e. stat exists and isn't error      /#
+ prevstat=stat # Save stat so we can determine if a connection has been made                                 /#
+
+
+ stat=getstat()
+ if left(stat,5)="ERROR" then goto "disconnect.html" /if
+ if stat="DISCONNECTED" and bcast="ERROR" then
+  prevstat=stat
+  temp=sendcommand("READY") if left(temp,5)="ERROR" or temp=0 then goto "disconnect.html" /if
+  bcast=sendcommand("BROADCAST "+chatid+" ("+companyname+")") bcast=systime
+ /if
+ if stat="CONNECTED" then bcast="ERROR" /if
+ if ajaxrequest='CLOSE' and left(ptwr,9)<>"GOTOEMAIL" then
+  stat="DISCONNECTED"
+  bcast="ERROR"
+  temp=breakconnect()
+ elif prevstat<>'CONNECTED' and stat='CONNECTED' then
+  append fillin('<div class="userinfo">'+connectedtomsg+'</div>')+lf to file=mydb+'.txt' /append
+ elif prevstat='CONNECTING' and stat='CONNECTING' then
+  # Ok no news yet wait until 10 seconds go by and try again /#
+  if rrq/7=floor(rrq/7) then
+   if rrq>21 then
+    bcast="GOTOEMAIL"
+    temp=sendcommand("BREAK "+chatid)
+   else
+    temp=sendcommand("READY") if left(temp,5)="ERROR" or temp=0 then goto "disconnect.html" /if
+    bcast=sendcommand("BROADCAST "+chatid+" ("+companyname+")<br>15 second rebroadcast") bcast=systime
+   /if
+  /if
+ elif stat='DISCONNECTED' and prevstat<>'DISCONNECTED' and left(ptwr,9)<>"GOTOEMAIL" then
+  append fillin('<div class="userinfo">'+disconnectedfrommsg+'</div>')+lf to file=mydb+'.txt' /append
+ /if
+ if ajaxrequest='CHECK' or ajaxrequest='CLOSE' then
+  # We simply send back the body text no other json stuff /#
+  requeststatus='CHECK'
+ elif stat='CONNECTED' then
+  if ajaxrequest<>'' and ajaxrequest<>'ERROR' and ajaxrequest<>'CHECK' then
+   append fillin('<div class="usertext">'+ajaxrequest+'</div>')+lf to file=mydb+'.txt' /append
+   temp=sendcommand("SEND "+chatid+" "+ajaxrequest)
+  /if
+  requeststatus="SENT"
+ else
+  # Not connected to a csr we don't append the conversation as it will go nowhere /#
+  if ajaxrequest<>'' and ajaxrequest<>'ERROR' and ajaxrequest<>'CHECK' and ajaxrequest<>'CLOSE' then
+   # Since they are trying to talk we will broadcast again /#
+   temp=sendcommand("READY") if left(temp,5)="ERROR" or temp=0 then goto "disconnect.html" /if
+   bcast=sendcommand("BROADCAST "+chatid+" ("+companyname+")<br>"+ajaxrequest) bcast=systime
+  /if
+  requeststatus="NOTSENT"
+ /if
+ # Ok we need to load our conversation                                                                       /#
+ copy file=mydb+'.txt' to twr /copy
+ dirty='FALSE'
+ if requeststatus="NOTSENT" then
+  temp='<div class="userinfo">'+fillin(notconnectedmsg)+'</div>'+lf
+  if right(twr,length(temp))<>temp then
+   twr=twr+temp
+  /if
+  dirty="TRUE"
+ /if
+ if count(twr,"<snd></snd>")>0 then dirty="TRUE" /if
+ if dirty='TRUE' then copy replaceall(twr,"<snd></snd>","") to file=mydb+'.txt' /copy /if
+ if  csrtyping=2 then twr=twr+fillin('<div class="userinfo">'+typingmsg+'</div>')+lf /if
+ # Set up some headers to not allow the browser to cache the requests /#
+ d=now d=
+ "Expires: Mon, 26 Jul 1997 05:00:00 GMT"+lf+
+ "Last-Modified: "+left(getweekday(d,'short'),3)+', '+getday(d)+' '+getmonth(d,'short')+' '+getyear(d,'long')+' 23:59:59 GMT'+lf+
+ "Cache-Control: no-cache, must-revalidate"+lf+
+ "Pragma: no-cache"
+ if rrq/3=floor(rrq/3) and stat<>"CONNECTED" then
+  twr=twr+'<div class="userinfo"><b>'+fillin(pagingrep)+'</b></div>'
+ /if
+ # Ok we are now going to send out a json response, unless it is just a refresh request /#
+ if requeststatus<>'CHECK' then
+
+
+  twr=^{responseStatus:"^+requeststatus+^",responseText:"^+JSONescape(insertimages(twr+' ',"[","]",0))+^"}^
+ /if
+ if bcast="GOTOEMAIL" then twr="GOTOEMAIL" /if
+ temp=webpush(insertimages(twr+' ',"[","]",0),"text/html"+lf+d)
+>>
+
+
+
+

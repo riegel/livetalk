@@ -1,0 +1,12 @@
+<<
+ d=now d=
+ "Expires: Mon, 26 Jul 1997 05:00:00 GMT"+lf+
+ "Last-Modified: "+left(getweekday(d,'short'),3)+', '+getday(d)+' '+getmonth(d,'short')+' '+getyear(d,'long')+' 23:59:59 GMT'+lf+
+ "Cache-Control: no-cache, must-revalidate"+lf+
+ "Pragma: no-cache"
+ if left(temp,5)="ERROR" then
+  temp=webpush("LOSTCONNECT","text/html"+lf+d)
+ else
+  temp=webpush("NOCSR","text/html"+lf+d)
+ /if
+>>

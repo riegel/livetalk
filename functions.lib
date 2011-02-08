@@ -1,0 +1,268 @@
+expand file="/clearimage/getimage.lib" /expand
+
+if reload="REQUEST" then
+ if companyid="ERROR" then companyid="Welcome.<br>Please wait while a customer service representative is contacted." /if
+ # These may be overwritten with values from chat_vars /#
+ typingmsg='[csrname] is typing a response.'
+ connectedtomsg='You have been connected to [csrname].'
+ disconnectedfrommsg='You have been disconnected from [csrname].'
+ notconnectedmsg='You are not in a chat session. Attempting to connect now.'
+ closestring='Disconnected - [now]'
+ mycomment=""
+ if chatid<>"" and chatid<>"ERROR" then
+  temp=breakconnect()
+  mydb='chats/comments'+chatid
+  if not(isfile(mydb+'.txt')) then
+   append '<div class="userinfo">'+companyid+'</div>'+lf to file=mydb+'.txt' /append
+   temp=sysfixprivate(mydb+'.txt')
+  /if
+ /if
+ copy file="/livetalk/csrlist.csv" ts="," to csrlist /copy
+ copy file="/livetalk/webbots.csv" ts="," to webbots /copy
+ copy file="/livetalk/chat_vars.csv" ts="," to chat_vars /copy
+ for name=chat_vars rowname=x do
+  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+   temp=indirectionset(aestivafilename(x[1]),x[2])
+  /if
+ /for
+ reload="TRUE"
+elif reload="ERROR" then
+  copy file="chat_vars.csv" ts="," to chat_vars /copy
+ for name=chat_vars rowname=x do
+  temp=indirectionset(x[1],x[2])
+ /for
+/if
+
+
+
+
+function lh_version() do
+ return '2.3' /return
+/function
+
+
+
+
+
+
+
+
+
+
+function insertimages(text,ldel,rdel,keepdel) locals L,LLD,LRD,a,b do
+
+
+
+
+ return replaceall(text,'<a ','<a target="new" ') /return
+
+ if count(text,ldel)=0 then return text /return /if
+ L=length(text)
+ LRD=length(rdel)
+ LLD=length(ldel)
+ a=locate(text,ldel)
+ b=right(text,L-a)
+ if count(b,rdel)=0 then return text /return /if
+ b=a+locate(b,rdel)
+ if keepdel=1 or keepdel='TRUE' then
+  tag=middle(text,a,b+LRD-1)
+ else
+  tag=middle(text,a+LLD,b-1)
+ /if
+ return left(text,a-1)+parsetag(tag)+insertimages(right(text,L-b-LRD+1),ldel,rdel,keepdel) /return
+/function
+
+function parsetag(text) locals upid,upid_record do
+  if left(text,10)='p8ste.com/' then text='www'+right(text,length(text)-10) /if
+  upid=text
+
+return '*'+text+'*' /return
+
+  if upid='' or upid='ERROR' then 
+   return text /return
+  else
+   upid_record=dbsearch('/pasteboard/database/upid','upid="'+upid+'"',1,1000)
+   if upid_record[3,1]='/pasteboard/sessions/'+upid_record[2,1] then
+    return text /return
+   else
+    text='<div class="img">'+upid_record[3,1]+'</div>'
+    return text /return
+   /if
+  /if
+/function
+
+
+
+
+
+
+
+
+
+
+
+
+function breakconnect() locals temp,a,b do
+ temp=sysfixprivate("chats/comments"+chatid+".txt")
+ a=fileinfo("chats/comments"+chatid+".txt")
+ b=timefrom(adddays(left(a[3,1],14),0),"MINUTES")
+ if b>60 then
+  copy file="chats/comments"+chatid+".txt" to temp /copy
+  if isfile("chatsarchive/comments"+chatid+".txt") then
+   append temp+lf+fillin('<div class="userinfo">'+closestring+'</div>')+lf to file="chatsarchive/comments"+chatid+".txt" /append
+  /if
+  temp=sysfixprivate("chatsarchive/comments"+chatid+".txt")
+  temp=fileremove("chats/comments"+chatid+".txt")
+ /if
+ reload="ERROR"
+ return temp /return
+/function
+
+
+function fillin(text) do
+ text=replaceall(text,'[csrname]',csrname)
+ text=replaceall(text,'[now]',getdate(now,"short")+" at "+gettime(now,"short"))
+ text=replaceall(text,'[chat]','<a href="chat.html">chat</a>')
+ text=replaceall(text,'[email]','<a href="email.html">email</a>')
+ text=replaceall(text,lf+lf,'<br>&nbsp;<br>')
+ text=replaceall(text,lf,'<br>')
+ return text /return
+/function
+
+
+
+
+function displaymenu(id) locals temp,a,editit do
+ a[1,1]='Status'
+ a[1,2]='Archives'
+ a[1,3]='Links'
+ a[1,4]='Sites'
+ a[1,5]='Server'
+ a[1,6]='Update'
+ if iconpage<>"ERROR" then
+  editit=''
+  if 1=0 then
+   if domainname="clearimageonline.com" then ei=ci_edit(page,800,600,'edit this page','','TRUE')+' | ' else ei='' /if
+   editit=ei+'<a href="'+iconpage+'">Desktop</a><br>&nbsp;<br>'
+  /if
+ else
+  editit=""
+ /if
+ temp=^
+ <div style="background-color: #FFFFFF; padding: 10px; padding-bottom: 0; margin: 0;">
+ ^+editit+^
+ <table cellpadding="3" cellspacing="0" border="0">
+  <tr>^
+ for name=a rowname=x do
+  if id="LOGIN" then
+    temp=temp+^   <td align="center" bgcolor="#ffffff">&nbsp;&nbsp;^+x[1]+^&nbsp;&nbsp;</td>^
+  else
+   if x[1]=id then
+    temp=temp+^   <td align="center" bgcolor="#dddddd">&nbsp;&nbsp;<a href="^+page+^"><img src="images/reload.gif" width="12" height="12" border="0"></a>^+x[1]+^&nbsp;&nbsp;</td>^
+   else
+    temp=temp+^   <td align="center" bgcolor="#ffffff">&nbsp;&nbsp;<a href="^+lower(x[1])+^.html">^+x[1]+^</a>&nbsp;&nbsp;</td>^
+   /if
+  /if
+ /for
+
+
+ temp=temp+^
+  </tr>
+ </table>
+ </div>^
+ return temp /return
+/function
+
+
+
+
+
+function getchatid() locals temp do
+ copy file="chatid.txt" to temp /copy
+ temp=temp+1
+ if isinteger(temp) then else temp="990000" /if
+ copy temp to file="chatid.txt" /copy
+ return temp /return
+/function
+
+
+
+function JSONescape(text) do
+ text=replaceall(text,'\','\\')
+ text=replaceall(text,'"','\"')
+ text=replaceall(text,'/','\/')
+ text=replaceall(text,lf,'\n')
+ text=replaceall(text,cr,'\r')
+ return text /return
+/function
+
+
+
+function toggle(a,t,f) do
+ if a=0 or a="TRUE" or a="Y" or a="yes" then
+  return f /return
+ elif a=1 or a="FALSE" or a="N" or a="no" then
+  return t /return
+ else
+  return "ERROR" /return
+ /if
+/function
+
+
+
+function sendcommand(command) locals temp,path,t,x,tr do
+  securitycode=encrypt(domainname,"livetalk")
+  x=netsockopen(0,"localhost",portnumber,100)
+  if x[1,1]<>'TRUE' then x=netsockclose(0) return 'ERROR Connecting to AIM RELAY server' /return /if
+  x=netsockwrite(0,securitycode+" "+command+cr+lf)
+  if x[1,1]<>'TRUE' then x=netsockclose(0) return 'ERROR Writing command to AIM RELAY server' /return /if
+  x=""
+  temp=""
+  while x<>"CLOSE" do
+   x=netsockread(0,500)
+   if x="CLOSE" then else temp=temp+x+lf /if
+  /while
+  x=netsockclose(0)
+  if left(command,7)="BRIDGES" then
+   temp=replaceall(temp,'"','')
+   if right(temp,1)=lf then temp=left(temp,length(temp)-1) /if
+   temp=ci_deltexttovar(temp,lf,",")
+  /if
+  return temp /return
+/function
+
+
+
+
+
+
+function getstat() locals temp,st,x do
+ temp=sendcommand("BRIDGES "+chatid)
+ if cols(temp)=1 and rows(temp)=1 then return temp /return /if
+ st="DISCONNECTED"
+ for name=temp rowname=x do
+  if x[4]=chatid then st="CONNECTED" csrtyping=x[9] csrname=x[1] csrid=x[1] /if
+  if count(x[5],chatid)>0 then st="CONNECTING"  csrtyping=x[9] csrname=x[1] csrid=x[1] /if
+ /for
+ for name=csrlist rowname=x do
+  if x[1]=csrid then csrname=x[2] /if
+ /for
+ return st /return
+/function
+
+
+
+function unpostprep(v) locals x,y,t,a do
+ x=split(v,'%')
+ t='ERROR'
+ for name=x rowname=y do
+  if t<>'ERROR' then
+   a=y[1]
+   t=t+ascii(ci_hextodec(middle(a,1,1))*16+ci_hextodec(middle(a,2,2)))+right(a,length(a)-2)
+  else
+   t=y[1]
+  /if
+ /for
+ return t /return
+/function
+

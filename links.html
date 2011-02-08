@@ -1,0 +1,78 @@
+<<
+if reload="ERROR" then reload="REQUEST" /if
+expand file="functions.lib" /expand
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<domainurl+dirname(page)>>chat.css" media="all">
+ <title>Live Answers - Links</title>
+ </head>
+<body>
+ <<displaymenu("Links")>>
+ <div class="setup">
+  <center>
+  <div style="border: 1px solid black; width: 650px; background-color: #CCCCCC; text-align: left; padding: 0; margin: 10px;">
+   <<weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.gif" border="0"></a>^>>
+  <div style="background-color: #888888; color: white;">Code For LiveTalk Icons (GIF). Paste this on your website to offer live help to your visitors.  <textarea cols="60" rows="4" name="weblink" style="width: 100%; height: 75px;"></textarea></div>
+   <table cellpadding="3" cellspacing="0" width="100%">
+    <tr>
+     <td>&nbsp;</td>
+     <td>
+      Below are the three possible states for LiveHelp.<br>&nbsp;&nbsp;<i>Click the edit icon (the little pencil) to change the default LiveTalk graphics (GIF).</i><br>&nbsp;<br>
+     </td>
+    </tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">Accepting Connections Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelp.gif','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelp.gif','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">No Connections Available Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelpoff.gif','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelpoff.gif','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">Live Help not working Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelpna.gif','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelpna.gif','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+   </table>
+  </div>
+  <div style="border: 1px solid black; width: 650px; background-color: #CCCCCC; text-align: left; padding: 0; margin: 10px;">
+   <<weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.png" border="0"></a>^>>
+  <div style="background-color: #888888; color: white;">Code For LiveTalk Icons (PNG). Paste this on your website to offer live help to your visitors.  <textarea cols="60" rows="4" name="weblink" style="width: 100%; height: 75px;"></textarea></div>
+   <table cellpadding="3" cellspacing="0" width="100%">
+    <tr>
+     <td>&nbsp;</td>
+     <td>
+      Below are the three possible states for LiveHelp.<br>&nbsp;&nbsp;<i>Click the edit icon (the little pencil) to change the default LiveTalk graphics (PNG).</i><br>&nbsp;<br>
+     </td>
+    </tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">Accepting Connections Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelp.png','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelp.png','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">No Connections Available Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelpoff.png','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelpoff.png','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+    <tr><td colspan="2" bgcolor="#bbbbbb">Live Help not working Graphic.</td></tr>
+    <tr>
+     <td align="right" bgcolor="#dddddd"><<ci_popup('images/livehelpna.png','<img src="images/edit.gif" width="12" height="12" border="0">')>></td>
+     <td bgcolor="#dddddd"><<ci_img('images/livehelpna.png','','','FALSE')>></td>
+    </tr>
+    <tr><td bgcolor="#dddddd" colspan="2">&nbsp;</td></tr>
+   </table>
+  </div>
+  </center>
+ </div>
+</body>
+</html>
+

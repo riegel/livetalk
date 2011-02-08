@@ -1,0 +1,58 @@
+<<
+if reload="ERROR" then reload="REQUEST" /if
+expand file="/livetalk/functions.lib" /expand
+copy file="/livetalk/chat_vars.csv" ts="," to chat_vars /copy
+for name=chat_vars rowname=x do
+ if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+  if x[1]='loginpassword' then loginpassword=x[2] /if
+ /if
+/for
+chat_vars="ERROR"
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+ <title>Live Answers - Login</title>
+ </head>
+<body>
+ <<displaymenu("Login")>>
+ <div class="setup">
+  <center>
+   <b>Login to Access your Live Talk Setup</b><br>&nbsp;<br>
+  <div style="width: 650px; background-color: #CCCCCC; text-align: left; padding: 10px;">
+   <<
+    if message<>'ERROR' then 
+     display '
+     <div style="color: red;">
+      <a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0" title="Clear Error"></a>&nbsp;'+message+'<br>&nbsp;<br>
+     </div>' /display
+    /if
+    message='ERROR'
+   >>
+   <form action="loginnow">
+    <input type="password" name="mypassword">
+    <input type="submit" name="mybutton" value="Login">
+   </form>
+  </div>
+  </center>
+ </div>
+</body>
+</html>
+<<overlay loginnow
+ if loginpassword="ERROR" or loginpassword="" then
+  message="NO MASTER PASSWORD FOUND LOGIN IS DISABLED"
+  goto page
+ /if
+ if mypassword=loginpassword then
+  mypassword="ERROR"
+  loginpassword="ERROR"
+  chat_vars="ERROR"
+  goto "/livetalk/status.html"
+ /if
+ if mypassword="ERROR" or mypassword="" then 
+  message="Missing Password"
+ else
+  message=^Bad Password^
+ /if
+ goto page
+>>

@@ -1,0 +1,338 @@
+<<
+expand file="/apps/clear/clear.lib" /expand
+
+
+if chat_vars='ERROR' then
+ expand file="functions.lib" /expand
+ copy file="chat_vars.csv" ts="," to chat_vars /copy
+ for name=chat_vars rowname=x do
+  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+   temp=indirectionset(aestivafilename(x[1]),x[2])
+  /if
+ /for
+ copy '<<portnumber='+portnumber+' securitycode="'+securitycode+'" goto "imagestatus.gif.html">>' to file="imagestatus.gif" /copy
+ copy '<<portnumber='+portnumber+' securitycode="'+securitycode+'" goto "imagestatus.png.html">>' to file="imagestatus.png" /copy
+/if
+
+
+ temp=sysls("initialdata")
+ for name=temp rowname=x do
+  if x[4]="FILE" then
+   if isfile(x[1]) then
+    # Do nothing already exists /#
+   else
+    a=syscp('initialdata/'+x[1],x[1])
+    if x[1]="chat.css" then else a=sysfixprivate(x[1]) /if
+   /if
+  /if
+ /for
+ temp=sysls("initialdata/images")
+ for name=temp rowname=x do
+  if x[4]="FILE" then
+   if isfile('images/'+x[1]) then
+    # Do nothing already exists /#
+   else
+    a=syscp('initialdata/images/'+x[1],'images/'+x[1])
+    a=sysfixpublic(x[1])
+   /if
+  /if
+ /for
+
+
+if reload="ERROR" then reload="REQUEST" /if
+expand file="functions.lib" /expand
+>>
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="<<syspublicurl+dirname(page)>>chat.css" media="all">
+  <title>Live Answers - Status</title>
+  <script src="<<syspublicurl>>/apps/clear/clear.js"></script>
+ </head>
+<body>
+ <<displaymenu("Status")>>
+
+
+<div class="setup">
+  <center>
+   <b>LiveTalk Server Monitor</b><br>&nbsp;<br>
+  <div style="width: 650px; background-color: #CCCCCC; text-align: left; padding: 10px;">
+ <<
+    ready=sendcommand("READY")
+    temp97=getenv('REMOTE_ADDR')
+    temp99=dbindex('/livetalk/connections',10000)
+    temp99=dbfind('/livetalk/connections','IP<>"'+temp97+'" AND DATETIME > "'+addminutes(now,-5)+'"',1,1,'')
+    temp99=tagresults[5,1] if temp99>9 then temp98='3px' else temp98='8px' /if
+    if left(ready,5)="ERROR" then
+     display "<b>A fatal error was encountered.</b> <i>("+ready+")</i><br>Proper operation will be halted until this is resolved. Perhaps the server isn't running." /display
+     bridges="ERROR"
+     for name=csrlist rowname=x do
+      for name=webbots rowname=y do
+       a[1]=x[1] a[2]=y[1] a[3]="NOTAVAILABLE" a[4]="" a[5]="" a[6]=0 a[7]=0 a[8]=0 a[9]=''
+       if bridges="ERROR" then bridges=a else bridges=append(bridges,a) /if
+      /for
+     /for
+     cls='<table width="200"><tr><td><div style="position: absolute;"><div style="position: relative; left: '+temp98+'; top: 5px; color: white;">'+temp99+'</div></div><a href="'+page+'"><img src="images/red.gif" border="0"></a></td><td>Server Failure. <a href="start">Start Server</a>.</td></tr></table>'
+    else
+     display "<b>"+ready+" Connections available.</b>" /display
+     if ready=0 then
+      cls='<table width="200"><tr><td><div style="position: absolute;"><div style="position: relative; left: '+temp98+'; top: 5px; color: black;">'+temp99+'</div></div><a href="'+page+'"><img src="images/yellow.gif" border="0"></a></td><td>Server is Running, but there are no available connections. Add Server Proxies, then click proxy icon to connect.</td></tr></table>'
+     else
+      cls='<table width="200"><tr><td><div style="position: absolute;"><div style="position: relative; left: '+temp98+'; top: 5px; color: white;">'+temp99+'</div></div><a href="'+page+'"><img src="images/green.gif" border="0"></a></td><td>Accepting chat requests. Chats will flow through green icons.</td></tr></table>'
+     /if
+     bridges=sendcommand("BRIDGES")
+    /if
+
+
+    weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.gif" border="0"></a>^
+    weblink2=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.png" border="0"></a>^
+
+
+
+    display '<br>&nbsp;&nbsp;&nbsp;<i>reset the server after changing server proxies or csr list</i><br>&nbsp;<br>' /display
+
+    display ^  <table width="650" style="border: 1px solid white; background-color: #eeeeee; color: #555555;">^ /display
+
+
+
+  if message<>'ERROR' then 
+   display '
+   <tr>
+    <td colspan="5" style="color: red;">
+     <a href="'+page+'"><img src="images/disconnect.gif" width="12" height="12" border="0" title="Clear Error"></a>&nbsp;'+message+'<br>&nbsp;<br>
+    </td>
+   </tr>' /display
+  else
+   display '
+   <tr>
+    <td colspan="5">
+     <a href="'+page+'" style="text-decoration: none;"><img src="images/reload.gif" width="12" height="12" border="0" title="Reload">&nbsp;Reload Page</a><br>&nbsp;<br>
+    </td>
+   </tr>' /display
+  /if
+  message='ERROR'
+ >>
+   <tr>
+    <td colspan="5">
+     These three boxes diagram how a web visitor from your site is connected to your customer service representatives (CSR's). This happens via "Server Proxies". Server Proxies are just AIM Screennames that you have signed up for to handle the requests from your web visitors to your CSR screennames. If a Server Proxy icon is not green click it to attempt a connection. It may take a few seconds to connect. The third box represents your CSR screennames. Instruct your CSR personnel to use whatever AIM compatible client they would like to answer incoming requests from your web site.
+    </td>
+   </tr>
+   <tr>
+    <td bgcolor="#aaaaaa" width="200"><table width="100%"><tr><td>Web Site</td><td align="right"></td></tr></table></td>
+    <td rowspan="2" align="center" valign="middle" width="25">&lt;<br>&gt;</td>
+    <td bgcolor="#aaaaaa" width="200"><table width="100%"><tr><td>Server Proxies <a href="reload"><i>(reset)</i></a></td><td align="right"><<ci_csv('webbots.csv',page,'','<img src="images/edit.gif" width="12" height="12" title="Edit Server Proxies" border="0">','','TRUE')>></td></tr></table></td>
+    <td rowspan="2" align="center" valign="middle" width="25">&lt;<br>&gt;</td>
+    <td bgcolor="#aaaaaa" width="200"><table width="100%"><tr><td>CSR</td><td align="right"><<ci_csv('csrlist.csv',page,'','<img src="images/edit.gif" width="12" height="12" title="Edit CSR List" border="0">','','TRUE')>></td></tr></table></td>
+   </tr>
+   <tr>
+    <td valign="center" align="center" bgcolor="#dddddd"><<cls>></td>
+    <td valign="top" bgcolor="#dddddd">
+     <table width="100%">
+     <<
+      for name=webbots rownum=x do
+       display toggle(bridges[8,x],'
+      <tr>
+       <td><img src="images/online.gif" width="12" height="12" border="0" title="Online"></td>
+       <td>'+webbots[1,x]+'</td>
+       <td><a href="disconnect" name="botnum" value="'+x+'"><img src="images/disconnect.gif" width="12" height="12" title="Disconnect Webbot" border="0"></a></td>
+      </tr>','
+      <tr>
+       <td><a href="connect" name="botnum" value="'+x+'"><img src="images/offline.gif" width="12" height="12" border="0" title="Offline, Click to Connect"></a></td>
+       <td>'+webbots[1,x]+'</td>
+       <td><a href="connect" name="botnum" value="'+x+'"><img src="images/connect.gif" width="12" height="12" title="Click to Connect Webbot" border="0"></a></td>
+      </tr>') /display
+      /for
+     >>
+     </table>
+    </td>
+    <td valign="top" bgcolor="#dddddd">
+     <table width="100%">
+     <<
+      for name=csrlist rownum=x do
+       display toggle(bridges[7,x*rows(webbots)],'
+      <tr>
+       <td><img src="images/online.gif" width="12" height="12" title="Online" border="0"></td>
+       <td>'+csrlist[2,x]+'</td>
+      </tr>','
+      <tr>
+       <td><img src="images/offline.gif" width="12" height="12" title="Offline, Setup AIM client and connect with it." border="0"></td>
+       <td>'+csrlist[2,x]+'</td>
+      </tr>') /display
+      /for
+     >>
+     </table>
+    </td>
+   </tr>
+  </table>
+  <table>
+   <tr>
+    <td>
+<br>&nbsp;<br>
+<form action="saveit" method="post">
+     <table>
+<<
+ copy file="chat_vars.csv" ts="," to chat_vars /copy
+ for name=chat_vars rowname=x do
+  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+   temp=indirectionset(aestivafilename(x[1]),x[2])
+  /if
+ /for
+ copy '<<portnumber='+portnumber+' goto "imagestatus.gif.html">>' to file="imagestatus.gif" /copy
+ copy '<<portnumber='+portnumber+' goto "imagestatus.png.html">>' to file="imagestatus.png" /copy
+ for name=chat_vars rowname=x do
+  if x[1]="-" then
+
+  else
+   if not(isinteger(x[4])) then x[4]=1 /if
+   if x[1]="portnumber" then
+    if left(ready,5)="ERROR" then
+     display ^
+       <tr>
+        <td><textarea name="^+x[1]+^" style="width: 350px; height: ^+((1+x[4])*18)+^px;"></textarea></td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+     ^ /display
+    else
+#    display ^
+       <tr>
+        <td>^+x[2]+^</td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+/#
+     display ^<input type="hidden" name="^+x[1]+^">^ /display
+    /if
+   elif x[1]="securitycode" then
+    if indirection(x[1])<>encrypt(domainname,"livetalk") then
+     display ^
+       <tr>
+        <td>SECURITY CODE FAILURE<br>CLICK "SAVE CHANGES" TO FIX.</td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+       <input type="hidden" name="^+x[1]+^">^
+     /display
+    else
+#    display ^
+       <tr>
+        <td>^+x[2]+^</td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+/#
+     display ^<input type="hidden" name="^+x[1]+^">^ /display
+    /if
+   elif x[1]="loginurl" then
+    if indirection(x[1])<>sysstartlink+dirname(page)+'login.html' then
+     loginurl=sysstartlink+dirname(page)+'login.html'
+     display ^
+       <tr>
+        <td>Login URL Not Set<br>CLICK "SAVE CHANGES" TO FIX.</td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+       <input type="hidden" name="^+x[1]+^">^
+     /display
+    else
+#    display ^
+       <tr>
+        <td><a href="^+x[2]+^">Test Login To Livetalk</a></td>
+        <td align="left">^+x[3]+^</td>
+       </tr>
+/#
+     display ^<input type="hidden" name="^+x[1]+^">^ /display
+    /if
+   else
+    display ^<input type="hidden" name="^+x[1]+^">^ /display
+   /if
+  /if
+ /for
+ if left(ready,5)="ERROR" then display ^
+      <tr><td colspan="2"><input type="submit" name="mybutton" value="Save Changes"></td></tr>
+  ^ /display
+ /if
+>>
+     </table>
+    </td>
+   </tr>
+   <tr>
+    <td>
+     <br>&nbsp;<br>Current Link Status<i>(this is what will show on your web site. First is GIF, second is PNG.)</i><br><<weblink>><br><<weblink2>>
+     <br>Use <a href="links.html">Links</a> to change the look of the icon and also to find the code to add it to your website. 
+    </td>
+   </tr>
+   <tr>
+    <td><br>&nbsp;<br>
+     <<ci_edit("aimrelay.c",800,600,"Edit C Wrapper for PERL server",'',"TRUE")>> | 
+     <<ci_edit("aimrelay.pl",800,600,"Edit PERL server",'',"TRUE")>> | 
+     <<ci_edit("aimserver.log",800,600,"View Server Log",'',"TRUE")>> | 
+     <<ci_edit("aimservererror.log",800,600,"View Error Log",'',"TRUE")>>
+     <br>&nbsp;<br>
+     <a href="start">Start Server</a> <i>(This will probably fail. The server needs to be started from a SSH session.)</i><br>
+     <a href="stop">Stop Server</a> <i>(use with extreme care as starting the server may not work without SSH.)</i>
+    </td>
+   </tr>
+   <tr>
+    <td>
+    </td>
+   </tr>
+  </table>
+
+
+
+
+
+
+
+
+
+<<ci_table(bridges)>>
+
+
+
+
+
+
+
+
+ </div>
+</body>
+</html>
+<<overlay connect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("CONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay disconnect
+ if botnum<>"" and botnum<>"ERROR" and isinteger(botnum) then
+  message=sendcommand("DISCONNECT "+webbots[1,botnum])
+ /if
+ goto page
+>>
+<<overlay reload
+ reload="ERROR"
+ message=sendcommand("RELOAD")
+ goto page
+>>
+<<overlay stop
+temp=sendcommand("EXIT")
+message="Server EXIT command sent: "+temp
+goto page
+>>
+<<overlay saveit
+  copy file="chat_vars.csv" ts="," to chat_vars /copy
+  securitycode=encrypt(domainname,"livetalk")
+  for name=chat_vars rownum=x do
+   if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
+    chat_vars[2,x]=indirection(chat_vars[1,x])
+   /if
+  /for
+  copy chat_vars to file="chat_vars.csv" ts="," /copy
+  message="Information Saved"
+  goto page
+>>
+<<overlay start
+# /usr/home/clearimageonline/cgi/private/livetalk /#
+temp='<hr>'
+temp=temp+syscall("LIVETALK", aliascommand("chmod")+" 755 "+ci_getpath(dirname(page)+"aimrelay.pl")+" 2>&1")+'<hr>'
+temp=temp+syscall("LIVETALK","aimrelay 2>&1")+'<hr>'
+message="Server command sent to start: <br>"+temp
+goto page
+>>
+
