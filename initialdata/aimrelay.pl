@@ -938,7 +938,7 @@ sub breaksession {
      }
     }
     if ($inbridge eq "FALSE") {
-     # Ok we didn't find it in the active requests, lets remove it from all pending requests
+     # Ok we di dn't find it in the active requests, lets remove it from all pending requests
      $dirty="FALSE";
      for ($j=0; $j<=$#bridges; $j++) {
       $i=$bridges[$j][4];

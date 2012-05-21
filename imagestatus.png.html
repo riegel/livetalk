@@ -4,7 +4,7 @@
 
 datetime=now
 ip=getenv('REMOTE_ADDR')
-temp=dbadd('/livetalk/connections')
+temp=dbadd('/apps/livetalk/connections')
 
 function sendcommand(command) locals temp,path,t,x,tr do
   securitycode=encrypt(domainname,"livetalk")

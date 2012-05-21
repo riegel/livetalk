@@ -1,4 +1,4 @@
-expand file="/clearimage/getimage.lib" /expand
+expand file="/system/clearimage/DLL.lib" /expand
 
 if reload="REQUEST" then
  if companyid="ERROR" then companyid="Welcome.<br>Please wait while a customer service representative is contacted." /if
@@ -17,9 +17,9 @@ if reload="REQUEST" then
    temp=sysfixprivate(mydb+'.txt')
   /if
  /if
- copy file="/livetalk/csrlist.csv" ts="," to csrlist /copy
- copy file="/livetalk/webbots.csv" ts="," to webbots /copy
- copy file="/livetalk/chat_vars.csv" ts="," to chat_vars /copy
+ copy file="/apps/livetalk/csrlist.csv" ts="," to csrlist /copy
+ copy file="/apps/livetalk/webbots.csv" ts="," to webbots /copy
+ copy file="/apps/livetalk/chat_vars.csv" ts="," to chat_vars /copy
  for name=chat_vars rowname=x do
   if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
    temp=indirectionset(aestivafilename(x[1]),x[2])
@@ -27,7 +27,7 @@ if reload="REQUEST" then
  /for
  reload="TRUE"
 elif reload="ERROR" then
-  copy file="chat_vars.csv" ts="," to chat_vars /copy
+  copy file="/apps/livetalk/chat_vars.csv" ts="," to chat_vars /copy
  for name=chat_vars rowname=x do
   temp=indirectionset(x[1],x[2])
  /for
@@ -37,7 +37,7 @@ elif reload="ERROR" then
 
 
 function lh_version() do
- return '2.3' /return
+ return '2.4' /return
 /function
 
 
@@ -107,7 +107,7 @@ function breakconnect() locals temp,a,b do
  a=fileinfo("chats/comments"+chatid+".txt")
  b=timefrom(adddays(left(a[3,1],14),0),"MINUTES")
  if b>60 then
-  copy file="chats/comments"+chatid+".txt" to temp /copy
+  copy file="/apps/livetalk/chats/comments"+chatid+".txt" to temp /copy
   if isfile("chatsarchive/comments"+chatid+".txt") then
    append temp+lf+fillin('<div class="userinfo">'+closestring+'</div>')+lf to file="chatsarchive/comments"+chatid+".txt" /append
   /if
@@ -178,10 +178,10 @@ function displaymenu(id) locals temp,a,editit do
 
 
 function getchatid() locals temp do
- copy file="chatid.txt" to temp /copy
+ copy file="/apps/livetalk/chatid.txt" to temp /copy
  temp=temp+1
  if isinteger(temp) then else temp="990000" /if
- copy temp to file="chatid.txt" /copy
+ copy temp to file="/apps/livetalk/chatid.txt" /copy
  return temp /return
 /function
 

@@ -1,7 +1,4 @@
 <<
-expand file="/apps/clear/clear.lib" /expand
-
-
 if chat_vars='ERROR' then
  expand file="functions.lib" /expand
  copy file="chat_vars.csv" ts="," to chat_vars /copy
@@ -59,8 +56,8 @@ expand file="functions.lib" /expand
  <<
     ready=sendcommand("READY")
     temp97=getenv('REMOTE_ADDR')
-    temp99=dbindex('/livetalk/connections',10000)
-    temp99=dbfind('/livetalk/connections','IP<>"'+temp97+'" AND DATETIME > "'+addminutes(now,-5)+'"',1,1,'')
+    temp99=dbindex('/apps/livetalk/connections',10000)
+    temp99=dbfind('/apps/livetalk/connections','IP<>"'+temp97+'" AND DATETIME > "'+addminutes(now,-5)+'"',1,1,'')
     temp99=tagresults[5,1] if temp99>9 then temp98='3px' else temp98='8px' /if
     if left(ready,5)="ERROR" then
      display "<b>A fatal error was encountered.</b> <i>("+ready+")</i><br>Proper operation will be halted until this is resolved. Perhaps the server isn't running." /display
@@ -83,8 +80,8 @@ expand file="functions.lib" /expand
     /if
 
 
-    weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.gif" border="0"></a>^
-    weblink2=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/livetalk/imagestatus.png" border="0"></a>^
+    weblink=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/apps/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/apps/livetalk/imagestatus.gif" border="0"></a>^
+    weblink2=^<a href="javascript:windowHandle=window.open('^+sysstartlink+^/apps/livetalk/startlink.html', 'startlinkhtml', 'width=470,height=320,status=no,scrollbars=no,resizable=yes,left=150');windowHandle.focus();" ><img src="^+sysstartlink+^/nosession/apps/livetalk/imagestatus.png" border="0"></a>^
 
 
 
@@ -330,8 +327,11 @@ goto page
 <<overlay start
 # /usr/home/clearimageonline/cgi/private/livetalk /#
 temp='<hr>'
+#
 temp=temp+syscall("LIVETALK", aliascommand("chmod")+" 755 "+ci_getpath(dirname(page)+"aimrelay.pl")+" 2>&1")+'<hr>'
 temp=temp+syscall("LIVETALK","aimrelay 2>&1")+'<hr>'
+/#
+temp=temp+syscall("LIVETALK","/http/clearimage/private/apps/livetalk/aimrelay.pl 2>&1")+'<hr>'
 message="Server command sent to start: <br>"+temp
 goto page
 >>

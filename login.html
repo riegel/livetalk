@@ -1,7 +1,7 @@
 <<
 if reload="ERROR" then reload="REQUEST" /if
-expand file="/livetalk/functions.lib" /expand
-copy file="/livetalk/chat_vars.csv" ts="," to chat_vars /copy
+expand file="/apps/livetalk/functions.lib" /expand
+copy file="/apps/livetalk/chat_vars.csv" ts="," to chat_vars /copy
 for name=chat_vars rowname=x do
  if x[1]<>'-' and x[1]<>'' and x[1]<>'ERROR' then
   if x[1]='loginpassword' then loginpassword=x[2] /if
@@ -47,7 +47,7 @@ chat_vars="ERROR"
   mypassword="ERROR"
   loginpassword="ERROR"
   chat_vars="ERROR"
-  goto "/livetalk/status.html"
+  goto "/apps/livetalk/status.html"
  /if
  if mypassword="ERROR" or mypassword="" then 
   message="Missing Password"

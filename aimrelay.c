@@ -42,7 +42,7 @@
 #include <unistd.h>
 
 /* you MUST set the command information in this next line */
-char *my_args[] = { "/http/clearimage/private/livetalk/aimrelay.pl" , NULL } ;
+char *my_args[] = { "/http/clearimage/private/apps/livetalk/aimrelay.pl" , NULL } ;
 
 int main ( int argc , char *argv[] , char *envp[] )
 {

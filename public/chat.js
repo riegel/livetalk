@@ -118,7 +118,7 @@ function jsinit()
                     var ch=objDiv.scrollHeight;
                     // Play a sound, if no sound then we will scroll anyhow as its a new comment.
                     if (right(a,11) == "<SND></SND>") {
-                     // soundManager.play('Pop','/livetalk/pop.mp3');
+                     // soundManager.play('Pop','/apps/livetalk/pop.mp3');
                      setTimeout('scrollBottom();', 500);
                     } else if (st+(dh/3) > ch-dh) {
                      setTimeout('scrollBottom();', 500);

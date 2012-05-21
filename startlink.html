@@ -11,8 +11,8 @@ companyname=""
 for name=chat_companies rowname=x do
  if count(HTTP_REFERER,x[1])>0 then
   if isfile(dirname(page)+lower("logos/"+aestivafilename(x[2]))) then
-   companyid='<img src="'+domainurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'"><br>'+fillin(x[3])+'<br>'
-   companylogo='<img src="'+domainurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'">'
+   companyid='<img src="'+syspublicurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'"><br>'+fillin(x[3])+'<br>'
+   companylogo='<img src="'+syspublicurl+dirname(page)+lower("logos/"+aestivafilename(x[2]))+'">'
   else
    companyid=fillin(x[3])
    companylogo=""

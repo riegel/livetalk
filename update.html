@@ -4,7 +4,7 @@ expand file=dirname(page)+"functions.lib" /expand
 if domainname="clearimageonline.com" then
  lh_serverversion=lh_version()
 else
- lh_serverversion=NETWEB('clearimageonline.com/cgi-bin/start/apps/livetalk/pushver.html',50000,15,'GET','','')
+ lh_serverversion=NETWEB('clearimageonline.com/cgi-bin/start/NOSESSION/apps/livetalk/pushver.html',50000,15,'GET','','')
 /if
 
 
@@ -45,11 +45,11 @@ else
 <<
  overlay getlivehelp
 
- thefile='/livetalk_'+replaceall(lh_serverversion,'.','_')+'.bb'
+ thefile='/apps/livetalk_'+replaceall(lh_serverversion,'.','_')+'.bb'
  if domainname="clearimageonline.com" then
-  temp=ci_cpfile('/livetalk.bb',thefile)
+  temp=ci_cpfile('/home/livetalk.bb',thefile)
  else
-  temp=NETWEB('www.clearimageonline.com/livetalk.bb',50000000,600,'GET','','',thefile)
+  temp=NETWEB('clearimageonline.com/home/livetalk.bb',50000000,600,'GET','','',thefile)
  /if
  fpl=FILEPACKLIST(thefile)
  fpl=getcoleq(fpl,1,'aimrelay.pl')
@@ -58,7 +58,7 @@ else
    # Do nothing /#
    message="Clear Image online can't update iself."
   else
-   temp=fileunpack(thefile,'/livetalk','')
+   temp=fileunpack(thefile,'/apps/livetalk','')
    if temp[1,1]="TRUE" then
     message='Live Answers upgraded.'
    else

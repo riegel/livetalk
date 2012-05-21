@@ -1,0 +1,47 @@
+yum install make
+yum install gcc
+yum install perl
+yum install cpan
+yum install perl-XML-Parser.i686
+yum install perl-Time-HiRes.i686
+
+cpan
+  > install Bundle::CPAN
+  > reload cpan
+
+> cd /root
+> wget http://search.cpan.org/CPAN/authors/id/C/CL/CLINTDW/SOCKS-0.03.tar.gz
+> tar -xzf ./SOCKS…
+> cd ./SOCKS…
+> perl Makefile.PL
+> make
+> make install
+
+
+> cd /root
+> wget http://search.cpan.org/CPAN/authors/id/T/TO/TODDR/Net-OSCAR-1.928.tar.gz
+> tar -xzf ./Net-OSCAR…
+> cd ./Net-OSCAR…
+> perl Makefile.PL
+> make
+> make install
+
+
+
+> cpan Text::CSV
+
+
+> cd /root
+
+
+> cd /root
+> wget http://search.cpan.org/CPAN/authors/id/H/HM/HMBRAND/Text-CSV_XS-0.82.tgz
+> tar -xzf ./Net-OSCAR…
+> cd ./Net-OSCAR…
+> perl Makefile.PL
+> make
+> make install
+
+
+> cpan Text::CSV::Simple
+
